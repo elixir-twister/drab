@@ -1,0 +1,22 @@
+<div id="begin"></div>
+<div id="drab_pid"></div>
+
+<button class="btn btn-success" id="button1" value="is there a button value?" data-d1="1" data-d2="[1, 2]" data-d3="d3">
+  Button
+</button>
+<br>
+<input id="input1" value="input1 value">
+<br>
+<input id="input2" value="input2 value">
+<br>
+<input value="input3 value">
+<br>
+<a href="http://tg.pl">tg.pl</a>
+<br>
+<textarea>textarea value</textarea>
+<br>
+<br>
+<div id="inner_outer"></div>
+<div id="inner_outer_out"></div>
+<br><br>
+<div id="my_element"></div>

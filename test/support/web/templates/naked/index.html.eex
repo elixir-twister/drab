@@ -1,0 +1,166 @@
+<h3 id="header">Drab Tests</h3>
+
+<div id="begin"></div>
+<div id="drab_pid"></div>
+
+<div id="run_handler_test"></div>
+
+<br>
+<div drab-commander="DrabTestApp.LoneCommander">
+  <button id="exec_lone_handler" drab-click="DrabTestApp.LoneCommander.lone_handler" drab-change="DrabTestApp.LoneCommander.other_handler">
+    DrabTestApp.LoneCommander.lone_handler/2
+  </button>
+
+  <button id="exec_lone_handler_2" drab-click="lone_handler" drab-change="other_handler">
+    lone_handler/2 under drab-commander="DrabTestApp.LoneCommander"
+  </button>
+</div>
+
+<br>
+<button id="outside_drab_commander" drab-click="run_handler_test">
+  Handler in my own Commander
+</button>
+
+<br>
+<button id="exec_non_public_handler" drab-click="DrabTestApp.LoneCommander.non_public_handler">
+  DrabTestApp.LoneCommander.non_public_handler/2
+</button>
+
+<br>
+<button id="exec_nonexisting_handler" drab-click="DrabTestApp.LoneCommander.nonexisting_handler">
+  DrabTestApp.LoneCommander.nonexisting_handler/2
+</button>
+
+<br>
+<button id="exec_fake_handler" drab-click="DrabTestApp.FakeCommander.fake_handler">
+  DrabTestApp.FakeCommander.fake_handler/2
+</button>
+
+<hr>
+
+<br>
+<button id="handler_with_null_param" drab-click="run_handler_test()">
+  run_handler_test()
+</button>
+
+<br>
+<button id="handler_with_param_1" drab-click="run_handler_test('text:text')">
+  run_handler_test('text:text')
+</button>
+
+<br>
+<button id="handler_with_param_2" drab-click="run_handler_test(Drab.toLocaleString())">
+  run_handler_test(Drab.toLocaleString())
+</button>
+
+<br>
+<button id="handler_with_param_3" drab-click="run_handler_test({one: 1, two: 2})">
+  run_handler_test({one: 1, two: 2})
+</button>
+
+<br>
+<button disabled=true id="handler_with_param_4" drab-click="My.Commander.run_handler_test({one: 1, two: 2})">
+  My.Commander.run_handler_test({one: 1, two: 2})
+</button>
+
+<br>
+<button id="handler_with_param_5" drab-click="run_handler_test({one: 1, two: 2})" drab-options="debounce(500)">
+  run_handler_test({one: 1, two: 2}) with debounce
+</button>
+
+<br>
+<button disabled=true id="handler_with_param_6" drab-click="My.Commander.run_handler_test({one: 1, two: 2})" drab-options="debounce(500)">
+  My.Commander.run_handler_test({one: 1, two: 2}) with debounce
+</button>
+
+<br>
+<button disabled=true id="handler_with_param_7" drab="click:My.Commander.run_handler_test({one: 1, two: 2}) keyup#debounce(500):My.Commander.run_handler_test({one: 1, two: 2})">
+  My.Commander.run_handler_test({one: 1, two: 2}) with debounce
+</button>
+
+<div drab-commander="Fake">
+  <button id="shared_handler_with_null_param" drab-click="DrabTestApp.LoneCommander.lone_handler()">
+    DrabTestApp.LoneCommander.lone_handler()
+  </button>
+
+  <br>
+  <button id="shared_handler_with_param_1" drab-click="DrabTestApp.LoneCommander.lone_handler('text:text')">
+    DrabTestApp.LoneCommander.lone_handler('text:text')
+  </button>
+
+  <br>
+  <button id="shared_handler_with_param_2" drab-click="DrabTestApp.LoneCommander.lone_handler(42)">
+    DrabTestApp.LoneCommander.lone_handler(42)
+  </button>
+
+  <br>
+  <button id="shared_handler_with_param_3" drab-click="DrabTestApp.LoneCommander.lone_handler(Drab.toLocaleString())">
+    DrabTestApp.LoneCommander.lone_handler(Drab.toLocaleString())
+  </button>
+</div>
+
+<hr>
+<div drab-argument="'text:text.(text)'">
+  <button id="handler_under_div_with_null_param" drab-click="run_handler_test()">
+    run_handler_test()
+  </button>
+  <br>
+
+  <button id="handler_under_div_without_param" drab-click="run_handler_test">
+    run_handler_test
+  </button>
+  <br>
+
+  <button id="handler_under_div_with_some_param" drab-click="run_handler_test(43)">
+    run_handler_test(43)
+  </button>
+  <br>
+
+  <button id="shared_handler_under_div_with_null_param" drab-click="DrabTestApp.LoneCommander.lone_handler()">
+    DrabTestApp.LoneCommander.lone_handler()
+  </button>
+  <br>
+
+  <button id="shared_handler_under_div_without_param" drab-click="DrabTestApp.LoneCommander.lone_handler">
+    DrabTestApp.LoneCommander.lone_handler
+  </button>
+  <br>
+
+  <button id="shared_handler_under_div_with_some_param" drab-click="DrabTestApp.LoneCommander.lone_handler(43)">
+    DrabTestApp.LoneCommander.lone_handler(43)
+  </button>
+  <br>
+</div>
+
+<hr>
+<div drab-commander="My.Commander" drab-argument="{some: '#object'}">
+  <button disabled=true id="handler_under_double_div_with_null_param" drab-click="run_handler_test()">
+    run_handler_test()
+  </button>
+  <br>
+
+  <button disabled=true id="handler_under_double_div_without_param" drab-click="run_handler_test">
+    run_handler_test
+  </button>
+  <br>
+
+  <button disabled=true id="handler_under_double_div_with_some_param" drab-click="run_handler_test({id: 43, node: '#id'})">
+    run_handler_test(43)
+  </button>
+  <br>
+
+  <button disabled=true id="handler_under_double_div_with_null_param_with_commander" drab-click="Other.run_handler_test()">
+    Other.run_handler_test()
+  </button>
+  <br>
+
+  <button disabled=true id="handler_under_double_div_without_param_with_commander" drab-click="Other.run_handler_test">
+    Other.run_handler_test
+  </button>
+  <br>
+
+  <button disabled=true id="handler_under_double_div_with_param_with_commander" drab-click="Other.run_handler_test({id: 43, node: '#id'})">
+    Other.run_handler_test(43)
+  </button>
+
+</div>

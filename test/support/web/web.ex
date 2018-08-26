@@ -1,20 +1,5 @@
 defmodule DrabTestApp.Web do
-  @moduledoc """
-  A module that keeps using definitions for controllers,
-  views and so on.
-
-  This can be used in your application as:
-
-      use DrabTestApp.Web, :controller
-      use DrabTestApp.Web, :view
-
-  The definitions below will be executed for every view,
-  controller, etc, so keep them short and clean, focused
-  on imports, uses and aliases.
-
-  Do NOT define functions inside the quoted expressions
-  below.
-  """
+  @moduledoc false
 
   def model do
     quote do
@@ -33,7 +18,7 @@ defmodule DrabTestApp.Web do
 
   def view do
     quote do
-      use Phoenix.View, root: "test/support/web/templates"
+      use Phoenix.View, root: "test/support/web/templates", pattern: "**/*"
 
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_csrf_token: 0, get_flash: 2, view_module: 1]

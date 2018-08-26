@@ -1,0 +1,2 @@
+<b>username: <%= @user %></b>
+

@@ -1,63 +1,74 @@
-const MODAL = "#_drab_modal"
-const MODAL_FORM = "#_drab_modal form"
-const MODAL_BUTTON_OK = "#_drab_modal_button_ok"
-const MODAL_BUTTON_CANCEL = "#_drab_modal_button_cancel"
-const MODAL_BUTTONS = ".drab-modal-button"
+const MODAL_WRAPPER = "_drab_modal_wrapper_";
+const MODAL_BUTTONS = ".drab-modal-button";
 
-Drab.on_connect(function(resp, drab) {
-  function modal_button_clicked(message, button_clicked) {
-    var vals = {}
-    var i = 0
-    $(MODAL + " form :input").map(function() {
-      var key = $(this).attr("name") || $(this).attr("id") || "__undefined_" + i++
-      vals[key] = $(this).val()
-    })
-    var query_output = [
-      message.sender,
-      {
-        button_clicked: button_clicked, 
-        params: vals
+Drab.on_connect(function (resp, drab) {
+
+  function modal_elems(id) {
+    var modal_wrapper, modal, modal_backdrop, form;
+    modal_wrapper = document.getElementById(MODAL_WRAPPER + id);
+    if (modal_wrapper) {
+      modal = modal_wrapper.querySelector(".modal")
+      return {
+        modal_wrapper: modal_wrapper,
+        modal: modal,
+        modal_backdrop: modal_wrapper.querySelector(".modal-backdrop"),
+        form: modal.querySelector("form")
       }
-    ]      
-    drab.channel.push("modal", {ok: query_output})
-    $(MODAL).modal('hide')
+    }
   }
 
-  drab.channel.on("modal", function(message) {
-    $modal = $(MODAL)
-    $(MODAL_FORM).on("submit", function() {
-      $(MODAL).data("clicked", true) // prevents double send
-      modal_button_clicked(message, "ok")
-      return false // prevent submit
-    })
-    $(MODAL_BUTTONS).on("click", function() {
-      $(MODAL).data("clicked", true)
-      modal_button_clicked(message, $(this).attr("name"))
-    })
-    $modal.on("hidden.bs.modal", function() {
-      clearTimeout(drab.modal_timeout_function)
-      if (!$(MODAL).data("clicked")) {
-        // if it is not an OK button (prevent double send)
-        modal_button_clicked(message, "cancel")
-      }
-    })
-    // set the timeout on a modal
-    // TODO: cancel this event after closing before the timeout
-    if (message.timeout) {
-      if (drab.modal_timeout_function) {
-        clearTimeout(drab.modal_timeout_function)
-      }
-      drab.modal_timeout_function = setTimeout(function() {
-        $(MODAL).data("clicked", true) // prevents double send
-        modal_button_clicked(message, "cancel")
-      }, message.timeout)
+  function clicked(message, element_name) {
+    clearTimeout(Drab["modal_timeout_function_" + message.id]);
+    var mod = modal_elems(message.id);
+    if (mod) {
+      var query_output = [message.sender, {
+        button_clicked: element_name,
+        params: Drab.form_params(mod.form)
+      }];
+      drab.channel.push("modal", { ok: query_output });
+
+      mod.modal.className = "modal fade";
+      mod.modal_backdrop.className = "modal-backdrop fade";
+      setTimeout(function () {
+        mod.modal_wrapper.outerHTML = "";
+      }, 100);
     }
+  }
 
-    // set focus on the form
-    $modal.on("shown.bs.modal", function() {
-      $(MODAL_FORM + " :input").first().focus()
-    })
+  drab.channel.on("modal", function (message) {
+    var mod = modal_elems(message.id);
+    if (mod) mod.modal_wrapper.outerHTML = "";
+    document.querySelector("body").insertAdjacentHTML("beforeend", message.html);
 
-    $modal.modal()
-  })
-})
+    mod = modal_elems(message.id);
+    setTimeout(function () {
+      <%= case Drab.Config.get(:modal_css) do %>
+        <% :bootstrap3 -> %> mod.modal.classList.add("in"); mod.modal_backdrop.classList.add("in");
+        <% :bootstrap4 -> %> mod.modal.classList.add("show"); mod.modal_backdrop.classList.add("show");
+      <% end %>
+      mod.form.querySelector("input, textarea, select").focus();
+    }, 50);
+
+    var buttons = mod.modal.querySelectorAll(MODAL_BUTTONS);
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].onclick = function (e) { clicked(message, e.srcElement.getAttribute("name"));}
+    }
+    mod.form.onsubmit = function(e) {
+      clicked(message, "ok");
+      e.preventDefault();
+      return false;
+    };
+    mod.form.onkeyup = function(e) {
+      var key = e.which || e.keyCode;
+      if (key == 27) {
+        clicked(message, "cancel");
+      }
+    }
+    if (message.timeout) {
+      Drab["modal_timeout_function_" + message.id] = setTimeout(function () {
+        clicked(message, "cancel");
+      }, message.timeout);
+    }
+  });
+});
+

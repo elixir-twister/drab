@@ -1,26 +1,22 @@
-## 0.4.0
-Changes:
-
 ## Bugs:
-* Ignoring unmatched topic "drab:/drab" in DrabPoc.UserSocket
 
 ## Future
+
 Changes:
-* rewrite Drab.Query - use meta, Luke!
-* broadcast to all except you
-* tests, tests, tests
-* benchmarks
-* timeout for event handlers
-* timeout for Drab.Query and Drab.Modal functions
-* specify on which pages drab broadcasts, with wildcard
-* dependencies for modules (for ex. Modal depends on Query)
-* extract Drab Store and Session to standalone module (loaded by default)
-* group JS commands to be launched in one step
-* render templates, views in commanders (accutally it can already be done, must thing about some helpers)
-* render Drab templates in a compile-time
+
+* optimistic updates
+* consider DynamicSupervisor as a replacement for Drab GenServer
+* is controller, action and assigns neccasary in drab token on page generation?
+* check if the handler exists in a compile time
+* benchmarks (compare to AJAX)
+* should take Safe in all html related functions
+* [elixir 1.7] change deppie to @deprecated and @since
+
+Changes:
+
+* group JS commands to be launched in one step, if possible
+
+Performance:
+
+* render additional, user templates in a compile-time
 * compress Drab templates (js)
-* before_handler, only: should take a list or atom (currently list only)
-
-
-## Bugs or features?
-* Drab.Socket steals all `connect` callbacks. Bad Drab

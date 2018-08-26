@@ -1,29 +1,58 @@
 defmodule Drab.Template do
   require IEx
-  @drab_templates "priv/templates/drab"  
+  require Logger
+
+  @drab_templates "/templates/drab"
 
   @moduledoc false
 
+  # compiling internal templates only
+  # Logger.debug("Compiling Drab Templates")
+
+  drab_templates =
+    [:drab |> :code.priv_dir() |> to_string(), @drab_templates, "*"]
+    |> Path.join()
+    |> Path.wildcard()
+
+  for template_with_path <- drab_templates do
+    @external_resource template_with_path
+
+    filename = Path.basename(template_with_path)
+    compiled = template_with_path |> EEx.compile_file() |> Macro.escape()
+
+    defp compiled_template(unquote(filename)) do
+      unquote(compiled)
+    end
+  end
+
+  # catch-all is to give an error when file not found
+  @spec compiled_template(String.t()) :: Macro.t() | no_return
+  defp compiled_template(filename) do
+    raise "Can't find the template `#{filename}` in priv."
+  end
+
   @doc false
-  def render_template(filename, bindings) do
-    EEx.eval_file(full_path(filename), bindings)
+  @spec render_template(atom, String.t(), Keyword.t()) :: String.t() | no_return
+  def render_template(endpoint, filename, bindings) do
+    p = Path.join(user_templates(endpoint), filename)
+
+    if p |> File.exists?() do
+      EEx.eval_file(p, bindings)
+    else
+      {result, _} = Code.eval_quoted(compiled_template(filename), bindings)
+      result
+    end
   end
 
-  defp full_path(filename) do
-    sources = Enum.map(paths(), &(priv_dir(&1))) |> Enum.map(&(Path.join(&1, filename)))
-    Enum.find(sources, &(File.exists?(&1))) || 
-      raise "Can't find the template `#{filename}` in `#{user_templates()}`"
-  end
+  @spec user_templates(atom) :: String.t() | no_return
+  defp user_templates(endpoint) do
+    case Drab.Config.get(endpoint, :templates_path) do
+      "priv" <> rest ->
+        priv = endpoint |> Drab.Config.app_name() |> :code.priv_dir() |> to_string()
+        Path.join(priv, rest)
 
-  defp priv_dir(app) when is_atom(app) do
-    Application.app_dir(app) |> Path.join(@drab_templates)
+      path ->
+        raise ":templates_path must start with `priv/`, given: #{path}"
+    end
   end
-  defp priv_dir(path) when is_binary(path) do
-    # Path.join(path, @drab_templates)
-    Path.join(".", path)
-  end
-
-  defp paths(), do: [user_templates(), :drab]
-
-  defp user_templates(), do: Drab.config.templates_path
 end

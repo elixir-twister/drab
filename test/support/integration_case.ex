@@ -1,4 +1,5 @@
 defmodule DrabTestApp.IntegrationCase do
+  @moduledoc false
   use ExUnit.CaseTemplate
   use Hound.Helpers
 
@@ -12,35 +13,60 @@ defmodule DrabTestApp.IntegrationCase do
       import DrabTestApp.IntegrationCase
 
       # The default endpoint for testing
-      @endpoint DrabTestApp.Endpoint
+      # @endpoint DrabTestApp.Endpoint
 
-      hound_session()
+      hound_session(
+        driver: %{
+          chromeOptions: %{
+            "args" => [
+              "--user-agent=#{Hound.Browser.user_agent(:chrome)}",
+              "--headless",
+              "--disable-gpu"
+            ]
+          }
+        }
+      )
     end
   end
 
-  setup _tags do
-    {:ok, conn: Phoenix.ConnTest.build_conn()}
+  # setup _tags do
+  #   {:ok, conn: Phoenix.ConnTest.build_conn()}
+  # end
+
+  def change_to_secondary_session(session_name \\ "secondary") do
+    change_session_to(
+      session_name,
+      driver: %{
+        chromeOptions: %{
+          "args" => [
+            "--user-agent=#{Hound.Browser.user_agent(:chrome)}",
+            "--headless",
+            "--disable-gpu"
+          ]
+        }
+      }
+    )
   end
 
   def wait_for_enable(element) do
     if element |> element_enabled? do
       :ok
-    else 
-      Process.sleep 100
+    else
+      Process.sleep(100)
       wait_for_enable(element)
     end
   end
 
   def click_and_wait(button_id) do
     button = find_element(:id, button_id)
-    button |> click()
-    button |> wait_for_enable()
+    click(button)
+    wait_for_enable(button)
   end
 
   def standard_click_and_get_test(test_name) do
     click_and_wait("#{test_name}_button")
     out = find_element(:id, "#{test_name}_out")
-    assert visible_text(out) == test_name        
+    assert visible_text(out) == test_name
   end
 
   defp drab_pid() do
@@ -49,11 +75,37 @@ defmodule DrabTestApp.IntegrationCase do
   end
 
   def drab_socket() do
-    GenServer.call(drab_pid(), :get_socket)
+    Drab.get_socket(drab_pid())
   end
 
   # removes hash from the begin of #selector
   def nohash(selector) do
     String.replace_leading(selector, "#", "")
+  end
+
+  def add_page_loaded_indicator(socket) do
+    js = """
+    var begin = document.getElementById("begin")
+    var txt = document.createTextNode("Page Loaded")
+    var elem = document.createElement("h3")
+    elem.appendChild(txt)
+    elem.setAttribute("id", "page_loaded_indicator");
+    begin.parentNode.insertBefore(elem, begin.nextElementSibling)
+    """
+
+    {:ok, _} = Drab.Core.exec_js(socket, js)
+  end
+
+  def add_pid(socket) do
+    p = inspect(socket.assigns.__drab_pid)
+    pid_string = ~r/#PID<(?<pid>.*)>/ |> Regex.named_captures(p) |> Map.get("pid")
+
+    js = """
+    var pid = document.getElementById("drab_pid")
+    var txt = document.createTextNode("#{pid_string}")
+    pid.appendChild(txt)
+    """
+
+    {:ok, _} = Drab.Core.exec_js(socket, js)
   end
 end

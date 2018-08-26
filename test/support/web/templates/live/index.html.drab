@@ -1,0 +1,114 @@
+<div id="begin"></div>
+<div id="drab_pid"></div>
+
+<br>
+<div id="color_main" @style.backgroundColor=<%=@color%>>
+  Users count: <%= @count %>
+</div>
+
+<br>
+<%= render("users.html", users: @users, count: @count, color: @color) %>
+<br>
+
+<button drab-click="update_both" class="btn btn-primary">
+  Update Both + Color
+</button>
+
+<br>
+
+<button drab-click="update_count" class="btn btn-primary">
+  Update Count
+</button>
+
+<br>
+<button drab-click="update_list" class="btn btn-primary">
+  Update List
+</button>
+
+<br><br>
+
+<%= render("partial1.html", in_partial: "primary value for partial 1", color: "#E6E6E6", link: "https://tg.pl") %>
+<br>
+<%= render(DrabTestApp.Live2View, "partial2.html", in_partial: "primary value for partial 2", color: "#FFCC66", link: "https://tg.pl")%>
+<br>
+<%= render("partial3.html", in_partial: "primary value for partial 3", color: "#E6E6E6", link: "https://tg.pl") %>
+<br>
+
+<button drab-click="update_in_partial1" class="btn btn-primary">
+  Update in Partial 1
+</button>
+<br>
+<button drab-click="update_in_partial2" class="btn btn-primary">
+  Update in Partial 2
+</button>
+<br>
+<button drab-click="update_in_partial2_bad" class="btn btn-primary">
+  Bad update in Partial 2
+</button>
+<br>
+<button drab-click="update_in_partial3" class="btn btn-primary">
+  Bad update in Partial 3
+</button>
+<br>
+<button drab-click="update_in_main_partial" class="btn btn-primary">
+  Update @color in main partial
+</button>
+<br><br>
+
+<br>
+<%= render("subfolder/subpartial.html", text: "text in the subpartial") %>
+<button drab-click="update_in_subpartial" class="btn btn-primary">
+  Update in Subpartial
+</button>
+<br>
+
+<hr>
+<b id="text_to_set_onload"><%= @text %></b>
+<br>
+
+<div>
+  <img src="<%= static_path(@conn, "/conn/should/not/be/in/assigns")%>">
+</div>
+
+<div>
+  <%= nodrab(@nodrab1) %>
+</div>
+
+<div>
+  <%/ @nodrab2 %>
+</div>
+
+<br><br><hr>
+<%# comments tests, all should compile %>
+<!-- comment --><%= @color %>
+<!--comment--><%= @color %>
+<!-- comment --><span><%= @color %></span>
+<span><!-- comment --><%= @color %></span>
+
+<%= if @color do %>
+  <!-- comment --><%= @color %>
+  <!--comment--><%= @color %>
+  <!-- comment --><span><%= @color %></span>
+  <span><!-- comment --><%= @color %></span>
+<% end %>
+<%= if @color do %>
+  <!-- comment -->
+<% end %>
+
+<%# comments tests, all should compile %>
+<!-- comment <%= @color %>--><%= @color %>
+<!--comment<%= @color %>--><%= @color %>
+<!-- comment <%= @color %>--><span><%= @color %></span>
+<span><!-- comment <%= @color %>--><%= @color %></span>
+
+<%= if @color do %>
+  <!-- comment <%= @color %>--><%= @color %>
+  <!--comment<%= @color %>--><%= @color %>
+  <!-- comment <%= @color %>--><span><%= @color %></span>
+  <span><!-- comment<%= @color %> --><%= @color %></span>
+<% end %>
+<%= if @color do %>
+  <!-- comment <%= @color %>-->
+<% end %>
+
+<!-- comment -->
